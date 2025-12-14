@@ -7,6 +7,15 @@ interface SweetInput {
   quantity: number;
 }
 
+interface SweetSearchQuery {
+  name?: string;
+  category?: string;
+  minPrice?: string;
+  maxPrice?: string;
+}
+
+/* ---------------- CREATE ---------------- */
+
 export const createSweet = async (data: SweetInput) => {
   const { name, category, price, quantity } = data;
 
@@ -15,43 +24,53 @@ export const createSweet = async (data: SweetInput) => {
   }
 
   return prisma.sweet.create({
-    data: { name, category, price, quantity }
+    data: { name, category, price, quantity },
   });
 };
+
+/* ---------------- READ ---------------- */
 
 export const getAllSweets = async () => {
   return prisma.sweet.findMany();
 };
 
-export const searchSweets = async (query: any) => {
-    if (Object.keys(query).length === 0) {
+/* ---------------- SEARCH ---------------- */
+
+export const searchSweets = async (query: SweetSearchQuery) => {
+  if (!query || Object.keys(query).length === 0) {
     return prisma.sweet.findMany();
-    }
+  }
+
   const { name, category, minPrice, maxPrice } = query;
+
+  const min = minPrice ? Number(minPrice) : undefined;
+  const max = maxPrice ? Number(maxPrice) : undefined;
+
+  if ((minPrice && Number.isNaN(min)) || (maxPrice && Number.isNaN(max))) {
+    throw new Error("Invalid price range");
+  }
 
   return prisma.sweet.findMany({
     where: {
       name: name ? { contains: name, mode: "insensitive" } : undefined,
       category: category ? { equals: category } : undefined,
-      price: {
-        gte: minPrice ? Number(minPrice) : undefined,
-        lte: maxPrice ? Number(maxPrice) : undefined
-      }
-    }
+      price:
+        min !== undefined || max !== undefined
+          ? { gte: min, lte: max }
+          : undefined,
+    },
   });
 };
 
-export const updateSweet = async (id: string, data: any) => {
+export const updateSweet = async (id: number, data: any) => {
   return prisma.sweet.update({
-    where: { id: Number(id) },
+    where: { id },
     data
   });
 };
 
-
-export const deleteSweet = async (id: string) => {
+export const deleteSweet = async (id: number) => {
   return prisma.sweet.delete({
-    where: { id: Number(id) }
+    where: { id }
   });
 };
-
