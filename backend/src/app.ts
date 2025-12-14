@@ -14,5 +14,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/sweets", sweetRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.get("/", (_req, res) => {
+  res.json({ status: "Sweet Shop API is running" });
+});
+
 
 export default app;
