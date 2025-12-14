@@ -111,3 +111,8 @@ AI significantly improved development speed and helped maintain clean architectu
 All backend APIs are covered by automated tests using Jest and Supertest.
 All test suites pass successfully, covering authentication, sweet CRUD operations, and inventory management.
 
+## Deployment
+The application can be deployed using:
+- Backend: Render / Railway
+- Frontend: Vercel / Netlify
+
