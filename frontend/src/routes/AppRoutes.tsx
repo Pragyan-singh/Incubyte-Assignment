@@ -6,6 +6,7 @@ import Dashboard from "../pages/Dashboard";
 import AdminPanel from "../pages/AdminPanel";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
+import AdminRoute from "./AdminRoute"; // ✅ ADD THIS
 
 export default function AppRoutes() {
   return (
@@ -32,7 +33,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Protected pages */}
+      {/* User protected dashboard */}
       <Route
         path="/dashboard"
         element={
@@ -42,12 +43,13 @@ export default function AppRoutes() {
         }
       />
 
+      {/* Admin-only protected route */}
       <Route
         path="/admin"
         element={
-          <ProtectedRoute>
+          <AdminRoute>
             <AdminPanel />
-          </ProtectedRoute>
+          </AdminRoute>
         }
       />
     </Routes>

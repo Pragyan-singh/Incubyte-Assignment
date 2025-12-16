@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../auth/AuthContext";
 import Button from "../components/ui/Button";
+import { jwtDecode } from "jwt-decode";
+
+type JwtPayload = {
+  userId: string;
+  role: "ADMIN" | "USER";
+};
 
 export default function Login() {
   const { login } = useAuth();
@@ -21,10 +27,25 @@ export default function Login() {
     const password = formData.get("password") as string;
 
     try {
-      const res = await api.post("/auth/login", { email, password });
+      const res = await api.post<{ token: string }>("/auth/login", {
+        email,
+        password,
+      });
 
-      login(res.data.token);
-      navigate("/dashboard");
+      const token = res.data.token;
+
+      // ✅ Save token
+      login(token);
+
+      // ✅ Decode role from JWT
+      const decoded = jwtDecode<JwtPayload>(token);
+
+      // 🔑 Role-based redirect
+      if (decoded.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {
@@ -37,7 +58,9 @@ export default function Login() {
       onSubmit={handleSubmit}
       className="max-w-md mx-auto mt-10 bg-white p-6 rounded-lg shadow"
     >
-      <h2 className="text-2xl font-semibold mb-4">Login</h2>
+      <h2 className="text-2xl font-semibold mb-4 ml-2">
+        Login
+      </h2>
 
       {error && (
         <p className="mb-3 text-sm text-red-600">

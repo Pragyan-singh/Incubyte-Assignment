@@ -28,16 +28,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = (newToken: string) => {
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
+  localStorage.setItem("token", newToken);
+  setToken(newToken);
 
-    try {
-      const decoded = jwtDecode<JwtPayload>(newToken);
-      setRole(decoded.role ?? null);
-    } catch {
-      setRole(null);
-    }
-  };
+  try {
+    const decoded = jwtDecode<JwtPayload>(newToken);
+    setRole(decoded.role ?? null);
+  } catch {
+    setRole(null);
+  }
+};
+
 
   const logout = () => {
     localStorage.removeItem("token");
