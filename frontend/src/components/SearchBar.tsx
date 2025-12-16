@@ -27,7 +27,7 @@ export default function SearchBar({ onSearch }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-wrap gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm"
+      className="flex flex-wrap gap-4 m-4 bg-white p-4 rounded-lg shadow-sm"
     >
       <input
         name="name"

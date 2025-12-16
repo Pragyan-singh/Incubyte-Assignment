@@ -1,19 +1,40 @@
 import { Routes, Route } from "react-router-dom";
+import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import AdminPanel from "../pages/AdminPanel";
 import ProtectedRoute from "./ProtectedRoute";
+import PublicRoute from "./PublicRoute";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* Public landing page */}
+      <Route path="/" element={<Landing />} />
 
-      {/* Protected Dashboard */}
+      {/* Public auth pages */}
       <Route
-        path="/"
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/register"
+        element={
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        }
+      />
+
+      {/* Protected pages */}
+      <Route
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <Dashboard />
@@ -21,7 +42,6 @@ export default function AppRoutes() {
         }
       />
 
-      {/* Protected Admin (optional) */}
       <Route
         path="/admin"
         element={

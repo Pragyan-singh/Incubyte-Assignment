@@ -88,7 +88,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-4">
+      <h2 className="text-2xl font-semibold m-4 text-center">
         Available Sweets
       </h2>
 

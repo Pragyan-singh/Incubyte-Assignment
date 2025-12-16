@@ -1,14 +1,13 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
+import { jwtDecode } from "jwt-decode";
+
+type JwtPayload = {
+  role?: "ADMIN" | "USER";
+};
 
 type AuthContextType = {
   token: string | null;
-  isAuthenticated: boolean;
+  role: "ADMIN" | "USER" | null;
   login: (token: string) => void;
   logout: () => void;
 };
@@ -16,40 +15,38 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Lazy initialization (best practice)
-  const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("token")
-  );
+  const storedToken = localStorage.getItem("token");
+
+  const [token, setToken] = useState<string | null>(storedToken);
+  const [role, setRole] = useState<"ADMIN" | "USER" | null>(() => {
+    if (!storedToken) return null;
+    try {
+      return (jwtDecode<JwtPayload>(storedToken).role ?? null);
+    } catch {
+      return null;
+    }
+  });
 
   const login = (newToken: string) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(newToken);
+      setRole(decoded.role ?? null);
+    } catch {
+      setRole(null);
+    }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
+    setRole(null);
   };
 
-  // Sync auth state across browser tabs
-  useEffect(() => {
-    const syncAuth = () => {
-      setToken(localStorage.getItem("token"));
-    };
-
-    window.addEventListener("storage", syncAuth);
-    return () => window.removeEventListener("storage", syncAuth);
-  }, []);
-
   return (
-    <AuthContext.Provider
-      value={{
-        token,
-        isAuthenticated: !!token,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ token, role, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

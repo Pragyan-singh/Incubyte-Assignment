@@ -1,11 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import Button from "./ui/Button";
-
 
 export default function Navbar() {
-  const { token, logout, role } = useAuth();
+  const { token, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const pathname = location.pathname;
+
+  const isLandingPage = pathname === "/";
+  const isLoginPage = pathname === "/login";
+  const isRegisterPage = pathname === "/register";
 
   const handleLogout = () => {
     logout();
@@ -13,22 +18,58 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="flex items-center justify-between px-6 py-3 bg-white shadow-sm">
-  <h1 className="text-xl font-bold text-primary">
-    <Link to="/">Sweet Shop</Link>
-  </h1>
+    <nav className="flex items-center justify-between px-6 py-3 h-16 border-b bg-white">
+      <h1 className="text-xl font-semibold">
+        <Link to="/">Sweet Shop</Link>
+      </h1>
 
-  <div className="flex gap-4 items-center">
-    <Link className="hover:text-primary" to="/">Dashboard</Link>
+      {/* Hide all auth buttons on landing page */}
+      {!isLandingPage && (
+        <div className="flex gap-4 items-center">
+          {token ? (
+            <>
+              <Link to="/dashboard">Dashboard</Link>
 
-    {role === "ADMIN" && (
-      <Link className="hover:text-primary" to="/admin">
-        Admin
-      </Link>
-    )}
+              <button
+                onClick={handleLogout}
+                className="text-red-600 font-medium"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              {/* On login page → show Register only */}
+              {isLoginPage && (
+                <Link
+                  to="/register"
+                  className="font-medium"
+                >
+                  Register
+                </Link>
+              )}
 
-    <Button onClick={handleLogout}>Logout</Button>
-  </div>
-</nav>
+              {/* On register page → show Login only */}
+              {isRegisterPage && (
+                <Link
+                  to="/login"
+                  className="font-medium"
+                >
+                  Login
+                </Link>
+              )}
+
+              {/* On other public pages (if any) → show both */}
+              {!isLoginPage && !isRegisterPage && (
+                <>
+                  <Link to="/login">Login</Link>
+                  <Link to="/register">Register</Link>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </nav>
   );
 }
